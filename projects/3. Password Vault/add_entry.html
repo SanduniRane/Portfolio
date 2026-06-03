@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Add Entry — Neon Vault</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h2 class="neon">Add Entry</h2>
+    <div class="card">
+      <input id="site" placeholder="Website / App name">
+      <input id="username" placeholder="Username">
+      <div class="pw-row" style="display:flex;gap:8px;">
+        <input id="password" placeholder="Password">
+        <button id="genBtn" class="btn btn-secondary">Generate</button>
+      </div>
+      <textarea id="notes" placeholder="Notes"></textarea>
+      <div class="row">
+        <button id="saveBtn" class="btn btn-primary">Save</button>
+        <a href="vault.html" class="btn btn-secondary">Cancel</a>
+      </div>
+      <p id="msg" class="error"></p>
+    </div>
+  </main>
+
+  <script src="vault-core.js"></script>
+  <script>
+  (async function(){
+    const site = document.getElementById('site'), username = document.getElementById('username'),
+          password = document.getElementById('password'), notes = document.getElementById('notes'),
+          genBtn = document.getElementById('genBtn'), saveBtn = document.getElementById('saveBtn'), msg = document.getElementById('msg');
+
+    function gen(len=16){
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>?";
+      let out=''; const arr=new Uint32Array(len); crypto.getRandomValues(arr);
+      for (let i=0;i<len;i++) out += chars[arr[i] % chars.length];
+      return out;
+    }
+    genBtn.addEventListener('click', ()=> password.value = gen(16));
+
+    saveBtn.addEventListener('click', async ()=>{
+      msg.textContent = '';
+      const s = site.value.trim(), u = username.value.trim(), p = password.value, n = notes.value.trim();
+      if (!s && !u && !p) { msg.textContent = 'Add at least site, username or password'; return; }
+
+      const sessionKeyB64 = vaultCore.getSessionKeyBase64();
+      if (!sessionKeyB64) { alert('Session expired'); location.href='welcome.html'; return; }
+      const key = await vaultCore.importRawKeyFromBase64(sessionKeyB64);
+      const stored = await vaultCore.getStoredVault();
+      if (!stored) { alert('No vault metadata'); location.href='welcome.html'; return; }
+      const vaultObj = await vaultCore.decryptWithKey(key, stored.ciphertext, stored.iv);
+      const entry = { id: Date.now() + Math.floor(Math.random()*999), site:s, username:u, password:p, notes:n, createdAt: new Date().toISOString() };
+      vaultObj.entries.push(entry);
+      const enc = await vaultCore.encryptWithKey(key, vaultObj);
+      await vaultCore.putStoredVault({ salt: stored.salt, iv: enc.iv, ciphertext: enc.ciphertext });
+      window.location.href = 'vault.html';
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #21025a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .splash-screen {
+            text-align: center;
+        }
+
+        /* Fade-in animation for heading */
+        .splash-screen h1 {
+            font-size: 2.5rem;
+            color: #91ebf1;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        /* Slide-in animation for paragraph */
+        .splash-screen p {
+            font-size: 1.2rem;
+            color: #e0e7ff;
+            margin-top: 20px;
+            opacity: 0;
+            animation: slideIn 2s forwards 1s;
+        }
+
+        /* Typing effect for heading (optional) */
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-screen">
+        <h1>Password Strength & Leak Checker</h1>
+        <p>Loading your secure experience...</p>
+    </div>
+
+    <script>
+        // Wait 5 seconds then redirect to index.html
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 5000);
+    </script>
+</body>
+</html>

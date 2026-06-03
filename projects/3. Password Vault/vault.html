@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Vault — Neon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h2 class="neon">🔐 Password Vault</h2>
+        <div class="small muted">Offline · AES-GCM · PBKDF2</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button id="lockBtn" class="btn btn-danger">Lock</button>
+      </div>
+    </header>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="searchbar">
+        <input id="searchInput" placeholder="Search by site / username" />
+        <select id="sortSelect">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
+        <div class="controls">
+          <a href="add_entry.html" class="btn btn-primary">+ Add Entry</a>
+          <button id="exportBtn" class="btn btn-secondary">Export Vault</button>
+          <label class="import-label btn-secondary">Import Vault
+            <input id="importFile" type="file" accept="application/json" hidden>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="vaultList" class="vault-list"></div>
+  </main>
+
+  <!-- Edit Modal (reused) -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Edit Entry</h3>
+      <input id="e_site" placeholder="Website / App name">
+      <input id="e_username" placeholder="Username">
+      <div class="pw-row">
+        <input id="e_password" placeholder="Password">
+        <button id="e_genBtn" class="btn btn-secondary">Generate</button>
+      </div>
+      <textarea id="e_notes" placeholder="Notes"></textarea>
+      <div class="row">
+        <button id="e_saveBtn" class="btn btn-primary">Save Changes</button>
+        <button id="e_cancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="vault-core.js"></script>
+  <script>
+  (async function(){
+    const vaultList = document.getElementById('vaultList');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const exportBtn = document.getElementById('exportBtn');
+    const importFile = document.getElementById('importFile');
+    const lockBtn = document.getElementById('lockBtn');
+
+    const editModal = document.getElementById('editModal');
+    const e_site = document.getElementById('e_site');
+    const e_username = document.getElementById('e_username');
+    const e_password = document.getElementById('e_password');
+    const e_notes = document.getElementById('e_notes');
+    const e_saveBtn = document.getElementById('e_saveBtn');
+    const e_cancelBtn = document.getElementById('e_cancelBtn');
+    const e_genBtn = document.getElementById('e_genBtn');
+
+    let vaultObj = null;
+    let sessionKeyB64 = vaultCore.getSessionKeyBase64();
+    if (!sessionKeyB64) { alert('Session not found. Please unlock the vault.'); location.href = 'welcome.html'; return; }
+    let sessionKey = await vaultCore.importRawKeyFromBase64(sessionKeyB64);
+
+    async function loadVault(){
+      const stored = await vaultCore.getStoredVault();
+      if (!stored) { alert('No vault found'); location.href = 'welcome.html'; return; }
+      vaultObj = await vaultCore.decryptWithKey(sessionKey, stored.ciphertext, stored.iv);
+    }
+
+    function showToast(msg, ttl=2200){
+      const t = document.createElement('div'); t.className='toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), ttl);
+    }
+
+    function generatePassword(len=16){
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>?";
+      let out = ""; const arr = new Uint32Array(len); crypto.getRandomValues(arr);
+      for (let i=0;i<len;i++) out += chars[arr[i] % chars.length];
+      return out;
+    }
+
+    await loadVault();
+    renderEntries();
+
+    // Search + sort events
+    searchInput.addEventListener('input', renderEntries);
+    sortSelect.addEventListener('change', renderEntries);
+
+    async function renderEntries(){
+      vaultList.innerHTML = '';
+      if (!vaultObj || !vaultObj.entries) { vaultList.innerHTML = '<div class="card"><p class="muted">No entries yet.</p></div>'; return; }
+      let arr = vaultObj.entries.slice();
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) arr = arr.filter(e => (e.site||'').toLowerCase().includes(q) || (e.username||'').toLowerCase().includes(q));
+      const sort = sortSelect.value;
+      if (sort === 'newest') arr.sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
+      if (sort === 'oldest') arr.sort((a,b)=> a.createdAt.localeCompare(b.createdAt));
+      if (sort === 'az') arr.sort((a,b)=> (a.site||'').localeCompare(b.site||''));
+      if (sort === 'za') arr.sort((a,b)=> (b.site||'').localeCompare(a.site||''));
+
+      if (!arr.length) { vaultList.innerHTML = '<div class="card"><p class="muted">No results.</p></div>'; return; }
+      arr.forEach(entry => {
+        const div = document.createElement('div'); div.className='entry';
+        div.innerHTML = `<h3>${vaultCore.escapeHtml(entry.site||'(no site)')}</h3>
+          <p><b>User:</b> ${vaultCore.escapeHtml(entry.username||'')}</p>
+          <p><b>Pass:</b> ${vaultCore.escapeHtml(entry.password||'')}</p>
+          <p class="muted">${vaultCore.escapeHtml(entry.notes||'')}</p>`;
+        const actions = document.createElement('div'); actions.className='entry-actions';
+        const downloadBtn = document.createElement('button'); downloadBtn.className='btn-ghost'; downloadBtn.textContent='Download';
+        downloadBtn.onclick = () => {
+          const payload = { site: entry.site, username: entry.username, password: entry.password, notes: entry.notes, createdAt: entry.createdAt };
+          const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+          const safe = (entry.site||'entry').replaceAll(/\s+/g,'_');
+          a.download = `${safe}_${entry.id || Date.now()}.json`; a.click();
+        };
+        const editBtn = document.createElement('button'); editBtn.className='btn-ghost'; editBtn.textContent='Edit';
+        editBtn.onclick = ()=> openEdit(entry);
+        const copyBtn = document.createElement('button'); copyBtn.className='btn-ghost'; copyBtn.textContent='Copy';
+        copyBtn.onclick = ()=> { navigator.clipboard.writeText(entry.password || ''); showToast('Password copied'); };
+        const delBtn = document.createElement('button'); delBtn.className='btn-ghost'; delBtn.textContent='Delete';
+        delBtn.onclick = async ()=> {
+          if (!confirm('Delete entry?')) return;
+          vaultObj.entries = vaultObj.entries.filter(e=> e.id !== entry.id);
+          await persistVault();
+          showToast('Deleted');
+          renderEntries();
+        };
+
+        actions.appendChild(downloadBtn); actions.appendChild(copyBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
+        div.appendChild(actions); vaultList.appendChild(div);
+      });
+    }
+
+    function openEdit(entry){
+      e_site.value = entry.site || '';
+      e_username.value = entry.username || '';
+      e_password.value = entry.password || '';
+      e_notes.value = entry.notes || '';
+      editModal.dataset.editId = entry.id;
+      editModal.classList.remove('hidden');
+    }
+
+    e_cancelBtn.addEventListener('click', ()=> editModal.classList.add('hidden'));
+    e_genBtn.addEventListener('click', ()=> e_password.value = generatePassword(16));
+    e_saveBtn.addEventListener('click', async ()=>{
+      const id = editModal.dataset.editId;
+      const idx = vaultObj.entries.findIndex(e=> e.id == id);
+      if (idx === -1) { alert('Entry missing'); editModal.classList.add('hidden'); return; }
+      vaultObj.entries[idx].site = e_site.value.trim();
+      vaultObj.entries[idx].username = e_username.value.trim();
+      vaultObj.entries[idx].password = e_password.value;
+      vaultObj.entries[idx].notes = e_notes.value.trim();
+      vaultObj.entries[idx].updatedAt = new Date().toISOString();
+      await persistVault();
+      editModal.classList.add('hidden');
+      renderEntries();
+      showToast('Saved');
+    });
+
+    async function persistVault(){
+      const enc = await vaultCore.encryptWithKey(sessionKey, vaultObj);
+      const stored = await vaultCore.getStoredVault();
+      await vaultCore.putStoredVault({ salt: stored.salt, iv: enc.iv, ciphertext: enc.ciphertext });
+    }
+
+    // Export vault
+    exportBtn.addEventListener('click', async ()=>{
+      const stored = await vaultCore.getStoredVault();
+      const payload = { salt: stored.salt, iv: stored.iv, ciphertext: stored.ciphertext, exportedAt: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vault_backup.json'; a.click();
+    });
+
+    // Import vault
+    document.querySelector('.import-label input').addEventListener('change', async e=>{
+      const f = e.target.files[0]; if (!f) return;
+      const txt = await f.text();
+      try {
+        const json = JSON.parse(txt);
+        if (!json.salt || !json.iv || !json.ciphertext) throw new Error('Invalid file');
+        await vaultCore.putStoredVault({ salt: json.salt, iv: json.iv, ciphertext: json.ciphertext });
+        vaultCore.clearSessionKey();
+        alert('Vault imported. You must unlock again.');
+        location.href = 'welcome.html';
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      } finally { e.target.value = ''; }
+    });
+
+    // Lock
+    lockBtn.addEventListener('click', ()=>{
+      if (!confirm('Lock vault and return to welcome?')) return;
+      vaultCore.clearSessionKey();
+      location.href = 'welcome.html';
+    });
+
+  })();
+  </script>
+</body>
+</html>

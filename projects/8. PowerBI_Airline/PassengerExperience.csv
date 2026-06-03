@@ -1,0 +1,6 @@
+FlightID,SatisfactionScore,ComplaintType,BaggageIssue,SeatComfort,StaffService
+F001,85,None,No,4,5
+F002,60,Delay,Yes,3,4
+F003,90,None,No,5,5
+F004,55,Technical,Yes,3,3
+F005,40,Cancellation,Yes,2,2

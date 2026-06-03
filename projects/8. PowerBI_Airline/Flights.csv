@@ -1,0 +1,6 @@
+FlightID,Date,Airline,FlightNumber,Origin,Destination,DepartureHour,ArrivalHour,DelayMinutes,DelayReason,Cancelled,Status,Passengers,FuelUsed
+F001,2024-01-01,SkyJet,SJ101,CMB,DXB,8,12,10,Weather,No,On-Time,180,5200
+F002,2024-01-01,AirLanka,AL202,CMB,SIN,14,18,45,Crew,No,Delayed,150,4800
+F003,2024-01-02,SkyJet,SJ305,DXB,CMB,6,10,0,None,No,On-Time,190,5100
+F004,2024-01-02,FlyAsia,FA410,CMB,BKK,20,23,90,Technical,No,Delayed,170,4600
+F005,2024-01-03,AirLanka,AL330,CMB,LHR,3,11,0,None,Yes,Cancelled,0,0

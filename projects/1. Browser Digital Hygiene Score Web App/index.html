@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Digital Hygiene Score</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash">
+    <div class="splash-inner fade-text">
+      <h1>Browser Digital Hygiene Score</h1>
+      <p>Scan any website to check its digital hygiene and security</p>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <section id="home" class="page hidden">
+    <div class="scan-input fade-text">
+      <input type="text" id="websiteUrl" placeholder="https://example.com">
+      <button id="scanBtn">Scan</button>
+    </div>
+    <h2 class="benefit-title fade-text">Benefits of Browser Digital Hygiene</h2>
+    <div class="benefits-container">
+      <div class="benefit fade-text">1. Protects personal data from leaks.</div>
+      <div class="benefit fade-text">2. Prevents malware infections.</div>
+      <div class="benefit fade-text">3. Enhances browser performance.</div>
+      <div class="benefit fade-text">4. Avoids phishing attacks.</div>
+      <div class="benefit fade-text">5. Secures online transactions.</div>
+      <div class="benefit fade-text">6. Maintains privacy on social media.</div>
+      <div class="benefit fade-text">7. Reduces tracking by advertisers.</div>
+      <div class="benefit fade-text">8. Ensures safer downloads and extensions.</div>
+    </div>
+  </section>
+
+  <!-- SCAN DETAILS PAGE -->
+  <section id="scan" class="page hidden">
+    <h2 class="fade-text">Scan Results for: <span id="currentUrl"></span></h2>
+    <div class="scan-results" id="scanResults"></div>
+    <button id="downloadPdfBtn" class="primary fade-text" disabled>Download Report</button>
+  </section>
+
+<script src="script.js"></script>
+</body>
+</html>

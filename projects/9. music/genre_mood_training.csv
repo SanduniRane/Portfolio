@@ -1,0 +1,6 @@
+BPM,PitchVariance,Loudness,SpectralCentroid,HarmonicRatio,Genre,Mood
+120,300,0.04,2500,0.65,Pop,Happy
+90,150,0.02,1800,0.45,Jazz,Calm
+140,400,0.05,3200,0.70,EDM,Energetic
+70,100,0.01,1200,0.40,Classical,Relaxed
+110,250,0.03,2100,0.55,Rock,Excited

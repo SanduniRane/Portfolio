@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Welcome — Secure Vault (Neon)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="splash" class="splash">
+    <h1 class="logo neon">🔐 Secure Password Wallet</h1>
+    <p class="tagline">Cyber Neon — Offline & Encrypted</p>
+  </div>
+
+  <main class="container hidden" id="main">
+    <h2 class="neon">Welcome — create your vault</h2>
+
+    <div class="card" id="createCard">
+      <h3>Create New Vault</h3>
+      <input id="newPwd" type="password" placeholder="Master password (min 6 chars)">
+      <input id="newPwd2" type="password" placeholder="Confirm master password">
+      <div class="row">
+        <button id="createBtn" class="btn btn-primary">Create Vault</button>
+      </div>
+      <p class="small muted">Keep your master password safe — it can't be recovered.</p>
+      <p id="createMsg" class="error"></p>
+    </div>
+
+    <div class="card hidden" id="loginCard">
+      <h3>Login to Existing Vault</h3>
+      <input id="loginPwd" type="password" placeholder="Master password">
+      <div class="row">
+        <button id="loginBtn" class="btn btn-primary">Unlock Vault</button>
+      </div>
+      <p id="loginMsg" class="error"></p>
+    </div>
+  </main>
+
+  <script src="vault-core.js"></script>
+  <script>
+  (async function(){
+    // show splash then main
+    setTimeout(()=>{ document.getElementById('splash').style.display='none'; document.getElementById('main').classList.remove('hidden'); }, 900);
+
+    const createBtn = document.getElementById('createBtn');
+    const newPwd = document.getElementById('newPwd');
+    const newPwd2 = document.getElementById('newPwd2');
+    const createMsg = document.getElementById('createMsg');
+    const loginCard = document.getElementById('loginCard');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginPwd = document.getElementById('loginPwd');
+    const loginMsg = document.getElementById('loginMsg');
+
+    // check if vault exists and show login section
+    const stored = await vaultCore.getStoredVault();
+    if (stored) loginCard.classList.remove('hidden');
+
+    // Create vault
+    createBtn.addEventListener('click', async ()=>{
+      createMsg.textContent = '';
+      const p1 = newPwd.value.trim(), p2 = newPwd2.value.trim();
+      if (!p1 || p1.length < 6) { createMsg.textContent = 'Password must be at least 6 chars.'; return; }
+      if (p1 !== p2) { createMsg.textContent = 'Passwords do not match.'; return; }
+
+      // generate salt & derive key
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const key = await vaultCore.deriveKeyFromPassword(p1, salt.buffer);
+      const exported = await vaultCore.exportRawKeyToBase64(key);
+
+      // create empty vault and encrypt
+      const emptyVault = { entries: [], createdAt: new Date().toISOString() };
+      const enc = await vaultCore.encryptWithKey(key, emptyVault);
+      await vaultCore.putStoredVault({ salt: vaultCore.bufToBase64(salt.buffer), iv: enc.iv, ciphertext: enc.ciphertext });
+
+      // save session key and go to vault
+      vaultCore.saveSessionKeyBase64(exported);
+      newPwd.value = newPwd2.value = '';
+      window.location.href = 'vault.html';
+    });
+
+    // Login existing vault
+    loginBtn.addEventListener('click', async ()=>{
+      loginMsg.textContent = '';
+      const p = loginPwd.value.trim();
+      if (!p) { loginMsg.textContent = 'Enter password'; return; }
+      const stored = await vaultCore.getStoredVault();
+      if (!stored) { loginMsg.textContent = 'No vault found'; return; }
+      try {
+        const key = await vaultCore.deriveKeyFromPassword(p, vaultCore.base64ToBuf(stored.salt));
+        const vault = await vaultCore.decryptWithKey(key, stored.ciphertext, stored.iv);
+        const exported = await vaultCore.exportRawKeyToBase64(key);
+        vaultCore.saveSessionKeyBase64(exported);
+        loginPwd.value = '';
+        window.location.href = 'vault.html';
+      } catch (err) {
+        console.error(err);
+        loginMsg.textContent = 'Incorrect password or corrupt vault.';
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

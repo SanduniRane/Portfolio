@@ -1,0 +1,7 @@
+RouteID,RouteName,TransportType,City,Distance_km
+R001,Colombo - Kandy,Bus,Colombo,115
+R002,Colombo - Galle,Bus,Colombo,120
+R003,Colombo - Negombo,Bus,Colombo,40
+R004,Colombo - Jaffna,Train,Colombo,400
+R005,Kandy - Badulla,Train,Kandy,180
+R006,Galle - Matara,Bus,Galle,35

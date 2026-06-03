@@ -1,0 +1,5 @@
+Date,Year,Month,MonthName,Day,DayName,Hour,PeakTime
+2024-01-01,2024,1,January,1,Monday,8,Yes
+2024-01-01,2024,1,January,1,Monday,14,Yes
+2024-01-02,2024,1,January,2,Tuesday,6,No
+2024-01-02,2024,1,January,2,Tuesday,20,Yes

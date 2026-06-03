@@ -1,0 +1,27 @@
+{
+  "name": "AI Audio Analytics Theme",
+  "background": "#F5F7FA",
+  "foreground": "#1A237E",
+  "tableAccent": "#1E88E5",
+  "dataColors": [
+    "#1E88E5",
+    "#43A047",
+    "#FB8C00",
+    "#E53935",
+    "#8E24AA"
+  ],
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [{
+          "fontSize": 14,
+          "fontFamily": "Segoe UI Semibold",
+          "color": "#1A237E"
+        }],
+        "labels": [{
+          "color": "#37474F"
+        }]
+      }
+    }
+  }
+}

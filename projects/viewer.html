@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Files Viewer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- Markdown Renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Custom CSS Base -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { 
+            padding: 40px; 
+        }
+        .viewer-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 80vh;
+        }
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .file-content {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .file-item {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .file-item:hover, .file-item.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--accent-primary);
+        }
+        .file-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-header h3 { margin: 0; font-size: 1.2rem; }
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        /* Syntax highlighting customization */
+        .content-area code {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .content-area pre {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,229,255,0.1);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        .content-area pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+        /* Markdown styling */
+        .content-area h1, .content-area h2, .content-area h3, .content-area h4 {
+            color: var(--accent-primary);
+            margin: 20px 0 12px 0;
+            font-weight: 600;
+        }
+        .content-area h1 { font-size: 1.8rem; }
+        .content-area h2 { font-size: 1.5rem; }
+        .content-area h3 { font-size: 1.2rem; }
+        .content-area a { color: var(--accent-primary); text-decoration: underline; }
+        .content-area a:hover { opacity: 0.8; }
+        .content-area blockquote {
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 16px;
+            margin-left: 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .content-area table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .content-area th, .content-area td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,229,255,0.1);
+        }
+        .content-area th {
+            background: rgba(0,229,255,0.1);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+        .content-area tr:hover {
+            background: rgba(0,229,255,0.05);
+        }
+        .no-selection {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-style: italic;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .no-selection i { font-size: 3rem; opacity: 0.5; }
+        .error-msg {
+            color: #ff6b6b;
+            padding: 20px;
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            background: rgba(255, 107, 107, 0.1);
+            margin: 20px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .file-list:focus-within { outline: 2px solid var(--accent-primary); outline-offset: 4px; }
+        .image-gallery-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+            align-items: center;
+        }
+        .gallery-thumb {
+            width: 82px;
+            height: 58px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+            background: rgba(255,255,255,0.05);
+        }
+        .gallery-thumb:hover,
+        .gallery-thumb:focus {
+            transform: translateY(-1px);
+            border-color: var(--accent-primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0,229,255,0.12);
+        }
+        .gallery-thumb.active {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(0,229,255,0.18);
+        }
+        .folder-item { user-select: none; }
+    </style>
+</head>
+<body>
+    <div class="blob-bg blob-1"></div>
+    <div class="blob-bg blob-2"></div>
+
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <a href="../index.html#projects" class="back-link"><i class="ph ph-arrow-left"></i> Back to Portfolio</a>
+        <h2 class="section-title" id="project-title" style="margin-bottom: 30px; font-size: 2rem;">Project Files</h2>
+    </div>
+
+    <div class="viewer-container">
+        <div class="project-info" id="project-info" style="flex:1;">
+            <!-- Project description will be injected here -->
+        </div>
+        <div class="file-list" id="file-list" style="flex:1;">
+            <!-- Files will be injected here -->
+        </div>
+        <div class="file-content">
+            <div class="file-header">
+                <h3 id="current-file-name">Select a file to view</h3>
+                <span style="font-size: 0.85rem; color: var(--text-secondary); padding: 4px 10px; border: 1px solid var(--border-color); border-radius: 20px;">Read Mode</span>
+            </div>
+            <div class="content-area" id="content-area">
+                <div class="no-selection">
+                    <i class="ph ph-file-text"></i>
+                    Select a text or CSV file from the list to preview its contents.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="fileData.js"></script>
+    <script src="folderData.js"></script>
+    <script src="dirIndex.js"></script>
+    <script>
+    (async function() {
+        const fileRegistry = {
+            "airline-dashboard": [
+                "Airline Operations & Passenger Experience Dashboard.pbix",
+                "Airlines.csv",
+                "Airport-download-hd-wallpapers.jpg",
+                "Airports.csv",
+                "DelayReasons.csv",
+                "FlightRoutes.csv",
+                "Flights.csv",
+                "PassengerExperience.csv",
+                "TimeDimension.csv"
+            ],
+            "inventory-management": [
+                "inventory_management_dashboard.pbix",
+                "inventory_management_dashboard.xlsx"
+            ],
+            "music-analytics": [
+                "audio_ai_theme.json",
+                "audio_features.csv",
+                "audio_features_ai.csv",
+                "genre_mood_training.csv",
+                "Live Audio Feature Extraction Dashboard.pbix"
+            ],
+            "smart-city": [
+                "2025-12-18 23-03-37.mp4",
+                "Dim_ComplaintCategory.csv",
+                "Dim_EnergySource.csv",
+                "Dim_Location.csv",
+                "Dim_Time.csv",
+                "Dim_Weather.csv",
+                "Fact_Complaints.csv",
+                "Fact_Energy.csv",
+                "Fact_Pollution.csv",
+                "Fact_Traffic.csv",
+                "SecurityTable.csv",
+                "Smart City Intelligence & Predictive Analytics.pbix"
+            ]
+        };
+
+        const projectFolderPaths = {
+            "airline-dashboard": "8. PowerBI_Airline",
+            "inventory-management": "10. Inventory_Management_Dashboard",
+            "music-analytics": "9. music",
+            "smart-city": "6. PowerBI3_Smart City Intelligence & Predictive Analytics Platform",
+            "browser-digital-hygiene": "1. Browser Digital Hygiene Score Web App",
+            "password-checker": "2. Password Strength & Leak Checker",
+            "password-vault": "3. Password Vault",
+            "cybersecurity-dashboard": "4. PowerBI1_Cybersecurity_Monitoring_Dashboard",
+            "sentiment-analysis": "5. PowerBI2_Sentiment_Analysis",
+            "public-transport": "7. PowerBI_Public Transport Performance Analytics",
+            "crypto-analytics": "11. Crypto",
+            "finsight": "12. FinSight",
+            "intelligent-invoice-pipeline": "13. intelligent_invoice_pipeline"
+        };
+
+        const projectTitles = {
+            "airline-dashboard": "Airline Operations & Passenger Experience Dashboard",
+            "inventory-management": "Inventory Management Dashboard",
+            "music-analytics": "Music Analytics Dashboard",
+            "smart-city": "Smart City Intelligence Dashboard",
+            "browser-digital-hygiene": "Browser Digital Hygiene Score Web App",
+            "password-checker": "Password Strength & Leak Checker",
+            "password-vault": "Password Vault",
+            "cybersecurity-dashboard": "Power BI Cybersecurity Monitoring Dashboard",
+            "sentiment-analysis": "Power BI Sentiment Analysis Dashboard",
+            "public-transport": "Public Transport Performance Analytics",
+            "crypto-analytics": "Crypto Analytics Dashboard",
+            "finsight": "FinSight Dashboard",
+            "intelligent-invoice-pipeline": "Intelligent Invoice Pipeline"
+        };
+
+        const projectDescriptions = {
+            "browser-digital-hygiene": "Developed a web-based security assessment tool that evaluates website safety and browser hygiene by analyzing HTTPS implementation, cookies, permissions, mixed content, and potential security risks. The application generates a comprehensive security score and downloadable PDF report to help users improve safe browsing practices and digital awareness.",
+            "password-checker": "Built a cybersecurity-focused web application that evaluates password strength based on complexity, length, and character diversity while checking exposure against known data breaches using the Have I Been Pwned API.",
+            "password-vault": "Designed and developed a secure offline password management solution that stores user credentials using AES-256 encryption and SHA-256 hashing. Supports credential creation, editing, import/export, and encrypted local storage.",
+            "cybersecurity-dashboard": "Created an interactive Power BI dashboard for monitoring cybersecurity metrics, security incidents, threat trends, and risk indicators. Implemented data modeling and KPI tracking to provide actionable insights.",
+            "sentiment-analysis": "Developed a business intelligence dashboard that analyzes customer sentiment data to identify trends, satisfaction levels, and public perception.",
+            "smart-city": "Built a comprehensive analytics platform integrating urban datasets such as air quality, traffic congestion, energy consumption, and citizen complaints. Implemented advanced data modeling, predictive analytics, and KPI reporting.",
+            "public-transport": "Designed a Power BI solution to analyze public transportation operations, including route performance, passenger demand, service reliability, and operational efficiency.",
+            "airline-dashboard": "Developed an interactive dashboard to analyze airline performance metrics, including delays, passenger satisfaction, and operational efficiency.",
+            "music-analytics": "Created an end-to-end music analytics solution that extracts audio features from music files using Python and machine learning techniques, and built a Power BI dashboard to visualize genre distribution and mood predictions.",
+            "inventory-management": "Developed an interactive inventory analytics dashboard that tracks stock levels, product performance, supplier efficiency, and reorder requirements.",
+            "crypto-analytics": "Built a data analytics dashboard to monitor cryptocurrency market trends, trading volumes, price movements, and portfolio performance.",
+            "finsight": "Developed a business intelligence dashboard to analyze customer savings behavior, loan portfolio risk, digital engagement, and cross-sell opportunities.",
+            "intelligent-invoice-pipeline": "Developed an automated invoice processing system that streamlines the entire invoice lifecycle from ingestion to approval using OCR, PDF parsing, validation rules, duplicate detection, and workflow automation."
+        };
+
+        async function loadProjectManifest() {
+            try {
+                const resp = await fetch('projectManifest.json');
+                if (resp.ok) {
+                    return await resp.json();
+                }
+            } catch (err) {
+                console.warn('Unable to load project manifest', err);
+            }
+            return {};
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project');
+        const projectManifest = await loadProjectManifest();
+        // load a full directory index (fallback) so user can browse actual folders/files
+        // prefer the script-provided `window.dirIndex` (works with file://), fall back to fetch
+        let dirIndex = (typeof window.dirIndex !== 'undefined' ? window.dirIndex : {});
+        if (!dirIndex || Object.keys(dirIndex).length === 0) {
+            try {
+                const resp = await fetch('dirIndex.json');
+                if (resp.ok) dirIndex = await resp.json();
+            } catch (e) {
+                // ignore
+            }
+        }
+        const folderName = projectFolderPaths[projectId] || projectId;
+        const manifestFilesRaw = folderName ? (projectManifest[folderName] || []) : [];
+        const manifestFiles = manifestFilesRaw.map(f => f.replace(/\\/g, '/'));
+
+        let projectEntry = null;
+        if (typeof folderData !== 'undefined' && folderData.projects) {
+            projectEntry = folderData.projects.find(p => p.id === projectId) || null;
+        }
+
+        const defaultTitle = projectTitles[projectId] || (projectId ? projectId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Project');
+        document.getElementById('project-title').innerText = defaultTitle + ' - Files';
+
+        let files = (projectEntry && projectEntry.files && projectEntry.files.length > 0)
+            ? projectEntry.files
+            : (manifestFiles.length > 0 ? manifestFiles : ((projectId && fileRegistry[projectId]) ? fileRegistry[projectId] : []));
+
+        // If no files found, try dirIndex to show actual folder contents and offer browsing
+        const allFolders = Object.keys(dirIndex || {});
+        // try exact match first
+        let resolvedFolderName = folderName && allFolders.includes(folderName) ? folderName : null;
+        // if not found, try fuzzy matching by title or id keywords
+        if (!resolvedFolderName && projectId) {
+            const title = (projectTitles[projectId] || projectId).toLowerCase();
+            // try matching by title words
+            const titleWords = title.replace(/[\W_]+/g, ' ').split(/\s+/).filter(Boolean);
+            resolvedFolderName = allFolders.find(f => {
+                const low = f.toLowerCase();
+                // contains the full title
+                if (low.includes(title)) return true;
+                // contains most title words
+                const matches = titleWords.filter(w => w && low.includes(w));
+                return matches.length >= Math.max(1, Math.floor(titleWords.length / 2));
+            }) || null;
+        }
+        // As a last resort, try matching by leading index number from folderName
+        if (!resolvedFolderName && folderName) {
+            const idxMatch = folderName.match(/^\d+/);
+            if (idxMatch) {
+                const idx = idxMatch[0];
+                resolvedFolderName = allFolders.find(f => f.trim().startsWith(idx + '.')) || null;
+            }
+        }
+        if ((!files || files.length === 0) && Object.keys(dirIndex).length > 0) {
+            // if we can resolve a specific folder, list its files, otherwise show folder browser
+            if (resolvedFolderName) {
+                files = dirIndex[resolvedFolderName];
+            } else {
+                // render a simple folder browser UI when no specific project files
+                renderFolderBrowser(dirIndex);
+                return;
+            }
+        }
+        const fileListEl = document.getElementById('file-list');
+        const contentArea = document.getElementById('content-area');
+        const fileNameEl = document.getElementById('current-file-name');
+
+        // render project info panel
+        const projectInfoEl = document.getElementById('project-info');
+        if (projectEntry) {
+            const fileCount = files.length;
+            projectInfoEl.innerHTML = `
+                <div class="glass-card" style="padding:20px; border-radius:12px;">
+                    <h3 style="margin-top:0;">${projectEntry.name}</h3>
+                    <p style="color:var(--text-secondary);">${projectEntry.description || ''}</p>
+                    <div style="margin-top:12px; color: var(--text-secondary);">Files: <strong>${fileCount}</strong></div>
+                    <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <a class="btn btn-outline" href="${projectEntry.viewer || ('viewer.html?project=' + encodeURIComponent(projectEntry.id))}">Open Viewer</a>
+                        <a class="btn btn-outline" href="../index.html#projects">Back to Projects</a>
+                    </div>
+                </div>
+            `;
+        } else if (manifestFiles.length > 0) {
+            projectInfoEl.innerHTML = `
+                <div class="glass-card" style="padding:20px; border-radius:12px;">
+                    <h3 style="margin-top:0;">${defaultTitle}</h3>
+                    <p style="color:var(--text-secondary);">This project is available from the file manifest. Browse the folder contents below.</p>
+                    <div style="margin-top:12px; color: var(--text-secondary);">Files: <strong>${files.length}</strong></div>
+                    <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <a class="btn btn-outline" href="../index.html#projects">Back to Projects</a>
+                    </div>
+                </div>
+            `;
+        } else if (resolvedFolderName) {
+            // Use folder name and description map when no projectEntry is present
+            const title = projectTitles[projectId] || (resolvedFolderName.replace(/\b\w/g, c => c.toUpperCase()));
+            const desc = projectDescriptions[projectId] || '';
+            projectInfoEl.innerHTML = `
+                <div class="glass-card" style="padding:20px; border-radius:12px;">
+                    <h3 style="margin-top:0;">${title}</h3>
+                    <p style="color:var(--text-secondary);">${desc}</p>
+                    <div style="margin-top:12px; color: var(--text-secondary);">Files: <strong>${files.length}</strong></div>
+                    <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <a class="btn btn-outline" href="viewer.html?project=${encodeURIComponent(projectId)}">Open Viewer</a>
+                        <a class="btn btn-outline" href="../index.html#projects">Back to Projects</a>
+                    </div>
+                </div>`;
+        } else {
+            projectInfoEl.innerHTML = `<div class="glass-card" style="padding:20px; border-radius:12px;"><p style="color:var(--text-secondary);">Project information not available.</p></div>`;
+        }
+
+        if (files.length === 0) {
+            fileListEl.innerHTML = '<p style="color: var(--text-secondary);">No files uploaded for this project yet.</p>';
+        } else {
+            const tree = buildFileTree(files);
+            renderFileTree(tree);
+            autoOpenFirstMedia(tree);
+        }
+
+        // Render a folder browser showing all folders and files (used as fallback)
+        function renderFolderBrowser(index) {
+            fileListEl.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'grid';
+            wrapper.style.gridTemplateColumns = 'repeat(auto-fit, minmax(260px, 1fr))';
+            wrapper.style.gap = '12px';
+            Object.entries(index).forEach(([folder, fileArr]) => {
+                const card = document.createElement('div');
+                card.className = 'glass-card';
+                card.style.padding = '12px';
+                card.innerHTML = `<h4 style="margin:0 0 8px 0;">${folder}</h4><div style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:8px;">${fileArr.length} file${fileArr.length!==1?'s':''}</div>`;
+                const list = document.createElement('div');
+                list.style.display = 'flex';
+                list.style.flexDirection = 'column';
+                list.style.gap = '6px';
+                fileArr.slice(0,40).forEach(f => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-outline';
+                    btn.style.padding = '8px 10px';
+                    btn.style.fontSize = '0.85rem';
+                    btn.style.textAlign = 'left';
+                    btn.textContent = f;
+                    btn.addEventListener('click', async () => {
+                        const ext = f.split('.').pop().toLowerCase();
+                        const dummy = document.createElement('div');
+                        dummy.className = 'file-item';
+                        await loadFile(folder, f, ext, dummy);
+                    });
+                    list.appendChild(btn);
+                });
+                card.appendChild(list);
+                wrapper.appendChild(card);
+            });
+            fileListEl.appendChild(wrapper);
+            // clear content area
+            contentArea.innerHTML = '<div class="no-selection"><i class="ph ph-file-text"></i><p style="margin-top:12px; color:var(--text-secondary);">Select a file to preview or open in a new tab.</p></div>';
+        }
+
+        // Build nested file/folder tree from file list (supports paths with '/').
+        function buildFileTree(files) {
+            const root = { name: '/', children: {}, type: 'folder', path: '' };
+            files.forEach(f => {
+                const parts = f.split('/');
+                let node = root;
+                for (let i = 0; i < parts.length; i++) {
+                    const part = parts[i];
+                    const isFile = (i === parts.length - 1);
+                    if (!node.children[part]) {
+                        node.children[part] = {
+                            name: part,
+                            children: {},
+                            type: isFile ? 'file' : 'folder',
+                            path: node.path ? node.path + '/' + part : part
+                        };
+                    }
+                    node = node.children[part];
+                }
+            });
+            return root;
+        }
+
+        function renderFileTree(tree) {
+            fileListEl.innerHTML = '';
+            // recursively render children
+            function renderNode(node, container, depth = 0) {
+                const entries = Object.values(node.children).sort((a,b)=> (a.type===b.type)?a.name.localeCompare(b.name):(a.type==='folder'? -1:1));
+                entries.forEach(child => {
+                    const row = document.createElement('div');
+                    row.style.paddingLeft = (12 * depth) + 'px';
+                    row.style.display = 'flex';
+                    row.style.alignItems = 'center';
+                    row.style.gap = '8px';
+                    if (child.type === 'folder') {
+                        row.className = 'file-item folder-item';
+                        row.tabIndex = 0;
+                        row.setAttribute('role', 'button');
+                        row.dataset.path = child.path;
+                        row.innerHTML = `<i class="ph ph-folder" style="font-size:1.25rem; color:var(--accent-primary)"></i> <strong style="flex:1">${child.name}</strong> <span style="color:var(--text-secondary); font-size:0.85rem;">folder</span>`;
+                        let expanded = false;
+                        const childContainer = document.createElement('div');
+                        childContainer.style.display = 'none';
+                        childContainer.style.flexDirection = 'column';
+                        childContainer.style.marginTop = '6px';
+                        row.onclick = (e) => {
+                            e.stopPropagation();
+                            expanded = !expanded;
+                            childContainer.style.display = expanded ? 'flex' : 'none';
+                        };
+                        row.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                row.click();
+                            }
+                        });
+                        container.appendChild(row);
+                        container.appendChild(childContainer);
+                        renderNode(child, childContainer, depth + 1);
+                    } else {
+                        row.className = 'file-item';
+                        row.tabIndex = 0;
+                        row.setAttribute('role', 'button');
+                        row.dataset.path = child.path;
+                        const ext = child.name.split('.').pop().toLowerCase();
+                        const icon = getIconForExtension(ext);
+                        row.innerHTML = `<i class="ph ${icon}" style="font-size: 1.25rem; color: var(--accent-primary);"></i> <span style="word-break: break-word; flex:1">${child.name}</span> <span style="color:var(--text-secondary); font-size:0.85rem;">${ext.toUpperCase()}</span>`;
+                        row.onclick = () => loadFile(projectId, child.path, ext, row);
+                        row.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                row.click();
+                            }
+                        });
+                        container.appendChild(row);
+                    }
+                });
+            }
+            renderNode(tree, fileListEl, 0);
+        }
+
+        function getIconForExtension(ext) {
+            if (ext === 'csv') return 'ph-file-csv';
+            if (['json', 'js', 'py', 'java', 'xml', 'sql', 'css', 'sh', 'bash', 'pyc'].includes(ext)) return 'ph-file-code';
+            if (['db', 'sqlite', 'sqlite3'].includes(ext)) return 'ph-file-sql';
+            if (ext === 'html') return 'ph-globe';
+            if (ext === 'pbix') return 'ph-chart-pie-slice';
+            if (ext === 'xlsx') return 'ph-file-xls';
+            if (ext === 'pdf') return 'ph-file-pdf';
+            if (ext === 'md') return 'ph-file-text';
+            if (['jpg', 'png', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) return 'ph-image';
+            if (['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(ext)) return 'ph-video';
+            if (['txt', 'log'].includes(ext)) return 'ph-file-text';
+            return 'ph-file';
+        }
+
+        async function loadFile(project, file, ext, element) {
+            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            fileNameEl.innerText = file;
+
+            const projectPath = projectFolderPaths[project] || project;
+            
+            // Construct file URL - handle both relative and file:// protocols
+            let fileUrl;
+            if (window.location.protocol === 'file:') {
+                // For file:// protocol, build absolute path with proper encoding
+                const currentPath = window.location.pathname.replace(/\\/g, '/');
+                const projectsDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
+                
+                // Encode path segments for special characters like spaces
+                const encodedProjectPath = projectPath.split('/').map(p => encodeURIComponent(p)).join('/');
+                const encodedFile = file.split('/').map(f => encodeURIComponent(f)).join('/');
+                
+                fileUrl = 'file://' + projectsDir + '/' + encodedProjectPath + '/' + encodedFile;
+                console.log('Loading file:', { project, file, projectPath, projectsDir, fileUrl });
+            } else {
+                // For http(s), use relative paths
+                fileUrl = `${projectPath}/${file}`;
+            }
+
+            if (['pbix', 'xlsx'].includes(ext)) {
+                contentArea.innerHTML = `
+                    <div class="no-selection">
+                        <i class="ph ph-file-arrow-down" style="color: var(--accent-primary);"></i>
+                        <h4 style="margin-bottom: 10px;">Open in Application</h4>
+                        <p style="text-align: center; max-width: 400px; margin-bottom: 20px;">This file needs a desktop application to open.</p>
+                        <a href="${fileUrl}" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; text-decoration: none; color: var(--bg-main); background: var(--accent-primary); font-weight: 600; cursor: pointer;">Open ${ext.toUpperCase()}</a>
+                    </div>`;
+                return;
+            }
+
+            if (['pyc', 'db', 'sqlite', 'sqlite3'].includes(ext)) {
+                contentArea.innerHTML = `
+                    <div class="no-selection">
+                        <i class="ph ph-file-arrow-down" style="color: var(--accent-primary);"></i>
+                        <h4 style="margin-bottom: 10px;">Open Binary File</h4>
+                        <p style="text-align: center; max-width: 440px; margin-bottom: 20px;">This is a binary file. Use a local application such as a code editor or SQLite viewer to inspect it.</p>
+                        <a href="${fileUrl}" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; text-decoration: none; color: var(--bg-main); background: var(--accent-primary); font-weight: 600; cursor: pointer;">Open ${ext.toUpperCase()}</a>
+                    </div>`;
+                return;
+            }
+
+            if (['jpg', 'png', 'jpeg', 'gif', 'svg', 'webp'].includes(ext)) {
+                // show image gallery + large preview
+                const galleryEl = await renderImageGallery(files, project, file);
+                contentArea.innerHTML = '';
+                if (galleryEl) contentArea.appendChild(galleryEl);
+                const imgWrap = document.createElement('div');
+                imgWrap.style.display = 'flex';
+                imgWrap.style.flexDirection = 'column';
+                imgWrap.style.gap = '12px';
+                const bigImg = document.createElement('img');
+                bigImg.src = fileUrl;
+                bigImg.alt = file;
+                bigImg.style.maxWidth = '100%';
+                bigImg.style.maxHeight = '70vh';
+                bigImg.style.objectFit = 'contain';
+                bigImg.style.borderRadius = '8px';
+                bigImg.onerror = () => {
+                    imgWrap.innerHTML = `<div class="no-selection" style="height: 100%;"><i class="ph ph-image" style="color: var(--accent-primary); font-size: 2.5rem;"></i><p style="color: var(--text-secondary); margin-top: 16px;">Image file not found at path:<br/>${fileUrl}</p></div>`;
+                };
+                imgWrap.appendChild(bigImg);
+                contentArea.appendChild(imgWrap);
+                return;
+            }
+
+            if (['mp4', 'webm', 'ogg'].includes(ext)) {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.style.width = '100%';
+                video.style.maxHeight = '70vh';
+                video.style.borderRadius = '12px';
+                video.style.background = '#000';
+                
+                const source = document.createElement('source');
+                source.src = fileUrl;
+                source.type = `video/${ext}`;
+                video.appendChild(source);
+                
+                const fallback = document.createElement('div');
+                fallback.className = 'no-selection';
+                fallback.style.height = '200px';
+                fallback.innerHTML = `<i class="ph ph-video" style="color: var(--accent-primary); font-size: 2.5rem;"></i><p style="color: var(--text-secondary); margin-top: 16px;">Video not found:<br/>${fileUrl}</p>`;
+                
+                video.onerror = () => {
+                    contentArea.innerHTML = '';
+                    contentArea.appendChild(fallback);
+                };
+                
+                contentArea.innerHTML = '';
+                contentArea.appendChild(video);
+                return;
+            }
+
+            if (ext === 'pdf') {
+                const iframe = document.createElement('iframe');
+                iframe.src = fileUrl;
+                iframe.style.width = '100%';
+                iframe.style.minHeight = '640px';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '12px';
+                
+                iframe.onerror = () => {
+                    contentArea.innerHTML = `<div class="no-selection" style="height: 100%;"><i class="ph ph-file-pdf" style="color: var(--accent-primary); font-size: 2.5rem;"></i><p style="color: var(--text-secondary); margin-top: 16px;">PDF not found:<br/>${fileUrl}</p></div>`;
+                };
+                
+                contentArea.innerHTML = '';
+                contentArea.appendChild(iframe);
+                return;
+            }
+
+            if (ext === 'html') {
+                // Preview HTML in iframe
+                contentArea.innerHTML = `
+                    <div style="height: 100%; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; gap: 8px;">
+                            <a href="${fileUrl}" target="_blank" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 8px; text-decoration: none; color: var(--bg-main); background: var(--accent-primary); font-weight: 600; cursor: pointer;">Open in New Tab</a>
+                        </div>
+                        <iframe src="${fileUrl}" style="width:100%; flex: 1; border:none; border-radius: 12px; background: white;"></iframe>
+                    </div>`;
+                return;
+            }
+
+            // Support fileData keyed by either projectId or folder name.
+            const dataKey = (projectFolderPaths[project] || project);
+            if (typeof fileData !== 'undefined' && fileData[dataKey] && fileData[dataKey][file] !== undefined) {
+                const content = fileData[dataKey][file];
+                if (['md'].includes(ext)) {
+                    contentArea.innerHTML = marked.parse(content);
+                    contentArea.querySelectorAll('pre code').forEach(el => {
+                        if (el.textContent) hljs.highlightElement(el);
+                    });
+                } else if (['csv'].includes(ext)) {
+                    contentArea.innerHTML = renderCSVTable(content);
+                } else if (['js', 'py', 'css', 'json', 'java', 'xml', 'sql', 'sh', 'bash'].includes(ext)) {
+                    const pre = document.createElement('pre');
+                    const code = document.createElement('code');
+                    code.className = `language-${ext === 'js' ? 'javascript' : ext === 'py' ? 'python' : ext === 'html' ? 'html' : ext === 'json' ? 'json' : ext}`;
+                    code.textContent = content;
+                    pre.appendChild(code);
+                    contentArea.innerHTML = '';
+                    contentArea.appendChild(pre);
+                    hljs.highlightElement(code);
+                } else {
+                    contentArea.textContent = content;
+                }
+                return;
+            }
+
+            if (['txt', 'csv', 'json', 'md', 'js', 'py', 'css', 'java', 'xml', 'sql', 'sh', 'bash'].includes(ext)) {
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const text = await response.text();
+                    
+                    if (ext === 'md') {
+                        contentArea.innerHTML = marked.parse(text);
+                        // Make all links open in new tab
+                        contentArea.querySelectorAll('a').forEach(link => {
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                        });
+                        contentArea.querySelectorAll('pre code').forEach(el => {
+                            if (el.textContent) hljs.highlightElement(el);
+                        });
+                    } else if (ext === 'csv') {
+                        contentArea.innerHTML = renderCSVTable(text);
+                    } else if (['js', 'py', 'css', 'json', 'java', 'xml', 'sql', 'sh', 'bash'].includes(ext)) {
+                        const pre = document.createElement('pre');
+                        const code = document.createElement('code');
+                        code.className = `language-${ext === 'js' ? 'javascript' : ext === 'py' ? 'python' : ext === 'json' ? 'json' : ext}`;
+                        code.textContent = text;
+                        pre.appendChild(code);
+                        contentArea.innerHTML = '';
+                        contentArea.appendChild(pre);
+                        hljs.highlightElement(code);
+                    } else {
+                        contentArea.textContent = text;
+                    }
+                } catch (err) {
+                    contentArea.innerHTML = `
+                        <div class="no-selection" style="flex-direction: column; gap: 20px;">
+                            <i class="ph ph-file-text" style="color: var(--accent-primary); font-size: 2.5rem;"></i>
+                            <div style="text-align: center;">
+                                <h4 style="margin: 10px 0;">Unable to Load File</h4>
+                                <p style="color: var(--text-secondary); margin: 10px 0; max-width: 500px;">
+                                    File path: <code style="color: var(--accent-primary); display: block; word-break: break-all; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; font-size: 0.85rem;">${fileUrl}</code>
+                                </p>
+                                <p style="color: var(--text-secondary); margin: 10px 0; max-width: 400px;">Error: ${err.message}</p>
+                                <a href="${fileUrl}" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; text-decoration: none; color: var(--bg-main); background: var(--accent-primary); font-weight: 600; cursor: pointer; display: inline-block; margin-top: 12px;">Try Opening File</a>
+                            </div>
+                        </div>`;
+                }
+                return;
+            }
+
+            contentArea.innerHTML = `
+                <div class="no-selection" style="flex-direction: column; gap: 20px;">
+                    <i class="ph ph-file-arrow-down" style="color: var(--accent-primary); font-size: 2.5rem;"></i>
+                    <div style="text-align: center;">
+                        <h4 style="margin: 10px 0;">Open File</h4>
+                        <p style="color: var(--text-secondary); margin: 10px 0; max-width: 400px;">Click below to open this file.</p>
+                        <a href="${fileUrl}" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.95rem; border-radius: 8px; text-decoration: none; color: var(--bg-main); background: var(--accent-primary); font-weight: 600; cursor: pointer; display: inline-block; margin-top: 12px;">Open File</a>
+                    </div>
+                </div>`;
+        }
+
+        // Helper to build absolute file path for debugging
+        function getDebugPath(project, file) {
+            const projectPath = projectFolderPaths[project] || project;
+            return `projects/${projectPath}/${file}`;
+        }
+
+        function renderCSVTable(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return '<p>Empty CSV file</p>';
+            
+            const table = document.createElement('table');
+            const rows = lines.map(line => {
+                // simple CSV parsing - handle quotes
+                const cells = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) {
+                        cells.push(current.replace(/^"|"$/g, '').trim());
+                        current = '';
+                    } else current += char;
+                }
+                cells.push(current.replace(/^"|"$/g, '').trim());
+                return cells;
+            });
+
+            rows.forEach((row, i) => {
+                const tr = document.createElement('tr');
+                row.forEach((cell, j) => {
+                    const tag = i === 0 ? 'th' : 'td';
+                    const el = document.createElement(tag);
+                    el.textContent = cell;
+                    tr.appendChild(el);
+                });
+                table.appendChild(tr);
+            });
+            // Return HTML string so callers can assign to innerHTML safely
+            return table.outerHTML;
+        }
+
+        // try list of URLs and return first that exists (or first in list for file:// protocol)
+        async function resolveExistingUrl(urls) {
+            // For file:// protocol, just return the first valid-looking URL (no fetch checks)
+            if (window.location.protocol === 'file:') {
+                return encodeURI(urls[0]);
+            }
+            
+            // For http(s), try to check which URL actually works
+            for (const url of urls) {
+                try {
+                    const resp = await fetch(url, { method: 'HEAD' });
+                    if (resp && resp.ok) return encodeURI(url);
+                } catch (e) {
+                    try {
+                        const r2 = await fetch(url, { method: 'GET' });
+                        if (r2 && r2.ok) return encodeURI(url);
+                    } catch (e2) {
+                        // continue to next URL
+                    }
+                }
+            }
+            // if none work, return first
+            return encodeURI(urls[0]);
+        }
+
+        document.addEventListener('keydown', handleViewerKeyboard);
+
+        function handleViewerKeyboard(event) {
+            const gallery = document.querySelector('.image-gallery-top');
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                const focusIsInside = fileListEl.contains(document.activeElement) || document.activeElement === document.body || contentArea.contains(document.activeElement);
+                if (!focusIsInside) return;
+                event.preventDefault();
+                focusFileRow(event.key === 'ArrowDown' ? 1 : -1);
+            }
+            if (gallery && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+                event.preventDefault();
+                focusGalleryThumb(event.key === 'ArrowRight' ? 1 : -1);
+            }
+        }
+
+        function focusFileRow(delta) {
+            const rows = Array.from(fileListEl.querySelectorAll('.file-item')).filter(row => !row.classList.contains('folder-item'));
+            if (!rows.length) return;
+            let index = rows.findIndex(row => row.classList.contains('active'));
+            if (index === -1) index = 0;
+            else index = Math.min(rows.length - 1, Math.max(0, index + delta));
+            const next = rows[index];
+            if (next) {
+                next.focus();
+                next.click();
+            }
+        }
+
+        function focusGalleryThumb(delta) {
+            const thumbs = Array.from(document.querySelectorAll('.gallery-thumb'));
+            if (!thumbs.length) return;
+            const activeIndex = thumbs.findIndex(img => img.classList.contains('active'));
+            let index = activeIndex === -1 ? 0 : Math.min(thumbs.length - 1, Math.max(0, activeIndex + delta));
+            const next = thumbs[index];
+            if (next) {
+                next.focus();
+                next.click();
+            }
+        }
+
+        async function renderImageGallery(allFiles, project, activeFile) {
+            const imageExts = ['jpg','jpeg','png','gif','svg','webp'];
+            const images = allFiles.filter(f => imageExts.includes(f.split('.').pop().toLowerCase()));
+            if (images.length <= 1) return; // no gallery needed
+
+            const gallery = document.createElement('div');
+            gallery.style.display = 'flex';
+            gallery.style.gap = '8px';
+            gallery.style.flexWrap = 'wrap';
+            gallery.style.marginBottom = '8px';
+
+            // For file:// protocol, skip lazy loading
+            const isFileProtocol = window.location.protocol === 'file:';
+            const observer = !isFileProtocol && ('IntersectionObserver' in window) ? new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const imgEl = entry.target;
+                    imgEl.src = imgEl.dataset.src;
+                    imgEl.removeAttribute('data-src');
+                    obs.unobserve(imgEl);
+                });
+            }, { root: gallery, threshold: 0.1 }) : null;
+
+            for (const img of images) {
+                const thumb = document.createElement('img');
+                const p = projectFolderPaths[project] || project;
+                
+                // Construct proper file paths with encoding
+                let imgUrl;
+                if (window.location.protocol === 'file:') {
+                    const currentPath = window.location.pathname.replace(/\\/g, '/');
+                    const projectsDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
+                    const encodedProjectPath = p.split('/').map(pt => encodeURIComponent(pt)).join('/');
+                    const encodedImg = img.split('/').map(i => encodeURIComponent(i)).join('/');
+                    imgUrl = 'file://' + projectsDir + '/' + encodedProjectPath + '/' + encodedImg;
+                } else {
+                    imgUrl = `${p}/${img}`;
+                }
+                
+                thumb.className = 'gallery-thumb';
+                thumb.alt = img;
+                thumb.tabIndex = 0;
+                
+                if (observer) {
+                    thumb.dataset.src = imgUrl;
+                    thumb.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+                    observer.observe(thumb);
+                } else {
+                    // Direct load for file:// protocol
+                    thumb.src = imgUrl;
+                }
+                
+                if (img === activeFile) thumb.classList.add('active');
+                thumb.onclick = async () => {
+                    const fileItems = Array.from(document.querySelectorAll('.file-item'));
+                    const el = fileItems.find(d => d.dataset.path === img || (d.textContent && d.textContent.trim() === img));
+                    if (el) el.click();
+                    else {
+                        const ext = img.split('.').pop().toLowerCase();
+                        const dummy = document.createElement('div');
+                        dummy.className = 'file-item';
+                        await loadFile(project, img, ext, dummy);
+                    }
+                };
+                thumb.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        thumb.click();
+                    }
+                });
+                gallery.appendChild(thumb);
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-gallery-top';
+            wrapper.appendChild(gallery);
+            return wrapper;
+        }
+    })();
+    </script>
+</body>
+</html>

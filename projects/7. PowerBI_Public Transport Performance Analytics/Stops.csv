@@ -1,0 +1,7 @@
+StopID,StopName,RouteID,Latitude,Longitude
+S001,Colombo Fort,R001,6.9344,79.8428
+S002,Kandy Central,R001,7.2906,80.6337
+S003,Galle Bus Stand,R002,6.0535,80.2210
+S004,Negombo Town,R003,7.2083,79.8358
+S005,Jaffna Station,R004,9.6615,80.0255
+S006,Matara Bus Stand,R006,5.9485,80.5353

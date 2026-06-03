@@ -1,0 +1,27 @@
+# Invoice Processing Pipeline — Python dependencies
+# Install with: pip install -r requirements.txt
+
+# Layer 2 — PDF Parsing
+pdfplumber==0.11.4        # Primary PDF text extraction (digital PDFs)
+pdf2image==1.17.0         # Convert PDF pages to images (for Tesseract fallback)
+pytesseract==0.3.13       # Python wrapper for Tesseract OCR
+
+# Layer 3 — Field Extraction (Day 3)
+python-dateutil==2.9.0    # Smart date parsing
+
+
+# Layer 5 — Scheduling (Day 4)
+APScheduler==3.10.4       # Lightweight job scheduler
+
+# Layer 5 — Routing (Day 4)
+PyYAML==6.0.1             # YAML configuration file parsing
+
+# Layer 6 — Dashboard (Day 4)
+Flask==2.3.3               # Lightweight web framework for dashboard
+
+# Utilities
+python-dotenv==1.0.1      # Load .env config files
+
+# Note: Tesseract itself is a system package, not a pip package.
+# Install it with:  sudo apt install tesseract-ocr poppler-utils
+# Or on Mac:        brew install tesseract poppler
