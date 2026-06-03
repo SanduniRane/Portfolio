@@ -3,8 +3,11 @@ html, body{
   margin:0;
   padding:0;
   font-family: 'Arial', sans-serif;
-  height:100%;
-  background-color:#000; /* avoid white flash */
+  min-height:100%;
+  background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 18%),
+              radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.14), transparent 18%),
+              linear-gradient(180deg, #050714 0%, #070a19 35%, #040713 100%);
+  color:#eef5ff;
   overflow-x:hidden;
 }
 
@@ -12,7 +15,7 @@ html, body{
 #splash{
   position:fixed;
   inset:0;
-  background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("https://wallpapers.com/images/hd/cyber-background-8p59zi1thtijrcww.jpg");
+  background-image: linear-gradient(rgba(5,7,20,0.8), rgba(5,7,20,0.8)), url("https://wallpapers.com/images/hd/cyber-background-8p59zi1thtijrcww.jpg");
   background-size:cover;
   background-position:center;
   display:flex;
@@ -69,7 +72,7 @@ html, body{
 
 /* ------------------- HOME PAGE ------------------- */
 #home{
-  background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("https://wallpaperbat.com/img/7952462-cyber-security-wallpaper-full-hd-4k.jpg");
+  background-image: linear-gradient(rgba(5,7,20,0.8), rgba(5,7,20,0.8)), url("https://wallpaperbat.com/img/7952462-cyber-security-wallpaper-full-hd-4k.jpg");
   background-size:cover;
   background-position:center;
 }
@@ -147,7 +150,7 @@ html, body{
 
 /* ------------------- SCAN DETAILS PAGE ------------------- */
 #scan{
-  background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("https://www.prodwaregroup.com/fr-fr/wp-content/uploads/sites/2/2023/03/gettyimages-1172944401-2560x1440.jpg");
+  background-image: linear-gradient(rgba(5,7,20,0.78), rgba(5,7,20,0.78)), url("https://www.prodwaregroup.com/fr-fr/wp-content/uploads/sites/2/2023/03/gettyimages-1172944401-2560x1440.jpg");
   background-size:cover;
   background-position:center;
 }

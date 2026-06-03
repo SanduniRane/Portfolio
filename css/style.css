@@ -32,13 +32,14 @@
 
 body {
     font-family: var(--font-body);
-    background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 20%),
-                radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.16), transparent 18%),
-                linear-gradient(180deg, #050714 0%, #070a19 40%, #040713 100%);
+    background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 18%),
+                radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.14), transparent 18%),
+                linear-gradient(180deg, #050714 0%, #070a19 35%, #040713 100%);
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
     position: relative;
+    min-height: 100vh;
 }
 
 body::before {
@@ -62,6 +63,7 @@ body::after {
     pointer-events: none;
     z-index: 0;
 }
+
 
 /* ==========================================================================
    Base Styles
