@@ -33,9 +33,10 @@
 
 body {
     font-family: var(--font-body);
-    background: radial-gradient(circle at top left, rgba(109, 94, 252, 0.18), transparent 18%),
-                radial-gradient(circle at bottom right, rgba(46, 183, 255, 0.16), transparent 18%),
-                linear-gradient(180deg, #050713 0%, #070b16 38%, #03050d 100%);
+    background: linear-gradient(135deg, #0f0c2f 0%, #1a0b3d 25%, #050713 50%, #0a1a3d 75%, #0f0c2f 100%),
+                radial-gradient(circle at top left, rgba(109, 94, 252, 0.25), transparent 15%),
+                radial-gradient(circle at bottom right, rgba(46, 183, 255, 0.22), transparent 15%);
+    background-attachment: fixed;
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
@@ -81,8 +82,10 @@ body::after {
     content: '';
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.14), transparent 25%),
-                radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.12), transparent 20%);
+    background: radial-gradient(circle at top left, rgba(109, 94, 252, 0.20), transparent 20%),
+                radial-gradient(circle at 60% 40%, rgba(46, 183, 255, 0.16), transparent 25%),
+                radial-gradient(circle at bottom right, rgba(200, 124, 255, 0.15), transparent 22%),
+                radial-gradient(circle at 30% 70%, rgba(109, 94, 252, 0.12), transparent 20%);
     pointer-events: none;
     z-index: 0;
 }
@@ -132,17 +135,19 @@ ul {
 .blob-1 {
     width: 42vw;
     height: 42vw;
-    background: radial-gradient(circle, rgba(109, 94, 252, 0.24) 0%, rgba(6, 9, 22, 0) 68%);
+    background: radial-gradient(circle, rgba(109, 94, 252, 0.32) 0%, rgba(79, 39, 245, 0.18) 40%, rgba(6, 9, 22, 0) 70%);
     top: -16vw;
     left: -16vw;
+    animation: blob-rotate 8s ease-in-out infinite;
 }
 
 .blob-2 {
     width: 36vw;
     height: 36vw;
-    background: radial-gradient(circle, rgba(46, 183, 255, 0.22) 0%, rgba(6, 9, 22, 0) 72%);
+    background: radial-gradient(circle, rgba(46, 183, 255, 0.28) 0%, rgba(30, 144, 255, 0.15) 40%, rgba(6, 9, 22, 0) 70%);
     bottom: -14vw;
     right: -8vw;
+    animation: blob-rotate 10s ease-in-out infinite reverse;
 }
 
 .hero-badge {
@@ -232,11 +237,11 @@ header {
     top: 0;
     width: 100%;
     height: var(--nav-height);
-    background: rgba(6, 9, 22, 0.9);
+    background: linear-gradient(135deg, rgba(6, 9, 22, 0.95), rgba(15, 12, 47, 0.92), rgba(10, 26, 61, 0.92));
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(46, 183, 255, 0.16);
-    box-shadow: 0 24px 80px rgba(2, 4, 12, 0.32);
+    border-bottom: 1px solid rgba(109, 94, 252, 0.18);
+    box-shadow: 0 24px 80px rgba(2, 4, 12, 0.32), inset 0 1px 0 rgba(109, 94, 252, 0.1);
     z-index: 1000;
 }
 
@@ -329,14 +334,22 @@ main {
 .hero-badge {
     display: inline-block;
     padding: 10px 22px;
-    background: rgba(109, 94, 252, 0.14);
-    border: 1px solid rgba(46, 183, 255, 0.24);
+    background: linear-gradient(135deg, rgba(109, 94, 252, 0.18), rgba(46, 183, 255, 0.14));
+    border: 1.5px solid rgba(109, 94, 252, 0.35);
     color: var(--accent-quaternary);
     border-radius: 999px;
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     margin-bottom: 26px;
+    box-shadow: 0 0 20px rgba(109, 94, 252, 0.15);
+    transition: all 0.3s ease;
+}
+
+.hero-badge:hover {
+    background: linear-gradient(135deg, rgba(109, 94, 252, 0.25), rgba(46, 183, 255, 0.22));
+    border-color: rgba(109, 94, 252, 0.5);
+    box-shadow: 0 0 30px rgba(109, 94, 252, 0.25);
 }
 
 .hero h1 {
@@ -435,15 +448,16 @@ main {
 .hero-visual::before {
     content: '';
     position: absolute;
-    width: 28rem;
-    height: 28rem;
+    width: 32rem;
+    height: 32rem;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(34, 211, 238, 0.18), transparent 52%);
-    filter: blur(80px);
+    background: conic-gradient(from 0deg, rgba(109, 94, 252, 0.35), rgba(46, 183, 255, 0.32), rgba(200, 124, 255, 0.28), rgba(109, 94, 252, 0.35));
+    filter: blur(90px);
     z-index: 0;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    animation: glow-rotate 6s linear infinite;
 }
 
 .hero-visual img {
@@ -453,18 +467,31 @@ main {
 
 .large-profile-img {
     display: block;
-    width: min(460px, 100%);
+    width: min(520px, 95%);
     max-width: 100%;
     height: auto;
-    max-height: 92vh;
+    max-height: 95vh;
     object-fit: contain;
     object-position: center;
-    background-color: rgba(255, 255, 255, 0.04);
-    border-radius: 40px;
-    border: 5px solid rgba(34, 211, 238, 0.45);
-    box-shadow: 0 45px 130px rgba(34, 211, 238, 0.24), 0 0 0 1px rgba(56, 189, 248, 0.14);
-    filter: drop-shadow(0 0 45px rgba(34, 211, 238, 0.22));
+    background: transparent;
+    border-radius: 50px;
+    border: none;
+    box-shadow: 0 0 60px rgba(109, 94, 252, 0.35),
+                0 0 90px rgba(46, 183, 255, 0.25),
+                inset 0 0 40px rgba(200, 124, 255, 0.08),
+                0 50px 150px rgba(34, 211, 238, 0.2);
+    filter: drop-shadow(0 0 40px rgba(109, 94, 252, 0.25)) drop-shadow(0 0 20px rgba(46, 183, 255, 0.15));
     transform: translateY(0);
+    transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.large-profile-img:hover {
+    transform: translateY(-8px);
+    filter: drop-shadow(0 0 50px rgba(109, 94, 252, 0.35)) drop-shadow(0 0 30px rgba(46, 183, 255, 0.25));
+    box-shadow: 0 0 80px rgba(109, 94, 252, 0.45),
+                0 0 120px rgba(46, 183, 255, 0.35),
+                inset 0 0 50px rgba(200, 124, 255, 0.12),
+                0 60px 180px rgba(34, 211, 238, 0.3);
 }
 
 /* ==========================================================================
@@ -900,6 +927,29 @@ footer {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes glow-rotate {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        background: conic-gradient(from 0deg, rgba(109, 94, 252, 0.35), rgba(46, 183, 255, 0.32), rgba(200, 124, 255, 0.28), rgba(109, 94, 252, 0.35));
+    }
+    50% {
+        background: conic-gradient(from 180deg, rgba(46, 183, 255, 0.35), rgba(200, 124, 255, 0.32), rgba(109, 94, 252, 0.28), rgba(46, 183, 255, 0.35));
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+        background: conic-gradient(from 360deg, rgba(109, 94, 252, 0.35), rgba(46, 183, 255, 0.32), rgba(200, 124, 255, 0.28), rgba(109, 94, 252, 0.35));
+    }
+}
+
+@keyframes blob-rotate {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-20px, 20px) scale(1.1);
     }
 }
 
