@@ -965,36 +965,77 @@ footer {
 }
 
 /* ==========================================================================
-   Responsive
+   Responsive Enhancements
+   - Improves layout for tablet and mobile devices
    ========================================================================== */
+
+@media (max-width: 1024px) {
+    main { padding: 0 24px; }
+    nav { padding: 0 24px; }
+    .glass-card { padding: 28px; }
+    .section { padding: 80px 0; }
+}
+
 @media (max-width: 768px) {
     .hero {
         flex-direction: column;
         text-align: center;
         padding-top: calc(var(--nav-height) + 40px);
+        gap: 24px;
     }
-    
-    .hero-actions {
-        justify-content: center;
-    }
-    
-    .social-links {
-        justify-content: center;
-    }
-    
-    .hero h1 {
-        font-size: 3rem;
-    }
-    
-    .nav-links {
-        display: none; /* In a real app we'd add a hamburger menu */
-    }
-    
-    .grid-2 {
-        grid-template-columns: 1fr;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
+
+    .hero-content { max-width: 680px; margin: 0 auto; }
+    .hero-actions { justify-content: center; }
+    .social-links { justify-content: center; }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+    .hero h2 { font-size: 1.25rem; }
+    .hero p { margin-inline: auto; max-width: 86%; }
+
+    .nav-links { display: none; } /* add a hamburger later if needed */
+
+    .grid-2 { grid-template-columns: 1fr; }
+    .section-title { font-size: 2rem; }
+
+    .projects-grid { grid-template-columns: 1fr; }
+    .certificate-card img, .achievement-card img { height: 140px; }
 }
+
+@media (max-width: 480px) {
+    :root { --nav-height: 64px; }
+    header { height: var(--nav-height); }
+    nav { padding: 0 16px; }
+    main { padding: 0 16px; }
+
+    .glass-card { padding: 20px; border-radius: 16px; }
+    .section { padding: 60px 0; }
+
+    .hero { padding-top: calc(var(--nav-height) + 20px); }
+    .hero-visual { min-height: 320px; }
+    .large-profile-img {
+        width: 260px;
+        border-radius: 50%;
+        box-shadow: 0 30px 90px rgba(109,94,252,0.25);
+    }
+
+    .btn { width: 100%; padding: 14px 16px; border-radius: 12px; }
+    .hero-actions { flex-direction: column; gap: 12px; }
+
+    .social-links a { font-size: 1.35rem; }
+
+    .nav-links { display: none; }
+
+    .timeline { padding-left: 12px; }
+    .timeline-dot { left: -20px; }
+
+    .certificate-card img, .achievement-card img { height: 120px; }
+
+    .contact-box { padding: 16px; }
+}
+
+/* Ensure images and cards scale nicely on very small devices */
+@media (max-width: 360px) {
+    .hero h1 { font-size: 2rem; }
+    .section-title { font-size: 1.6rem; }
+    .large-profile-img { width: 200px; }
+}
+
