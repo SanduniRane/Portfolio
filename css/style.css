@@ -733,7 +733,7 @@ main {
 
 .certificate-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
     gap: 24px;
 }
 
@@ -782,7 +782,7 @@ main {
 
 .achievement-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
     gap: 24px;
     margin-top: 20px;
 }
@@ -974,6 +974,11 @@ footer {
     nav { padding: 0 24px; }
     .glass-card { padding: 28px; }
     .section { padding: 80px 0; }
+
+    .certificate-grid,
+    .achievement-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
@@ -997,6 +1002,10 @@ footer {
     .section-title { font-size: 2rem; }
 
     .projects-grid { grid-template-columns: 1fr; }
+    .certificate-grid,
+    .achievement-grid {
+        grid-template-columns: 1fr;
+    }
     .certificate-card img, .achievement-card img { height: 140px; }
 }
 
