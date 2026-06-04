@@ -5,12 +5,12 @@
     /* Colors */
     --bg-main: #050713;
     --bg-secondary: #070a16;
-    --text-primary: #eef6ff;
-    --text-secondary: #9abff8;
-    --accent-primary: #6d5efc;
-    --accent-secondary: #2eb7ff;
-    --accent-tertiary: #e45cf7;
-    --accent-quaternary: #53d6ff;
+    --text-primary: #f8fbff;
+    --text-secondary: #d8e7ff;
+    --accent-primary: #8b7dff;
+    --accent-secondary: #5ac8ff;
+    --accent-tertiary: #e78afc;
+    --accent-quaternary: #7ce2ff;
     --border-color: rgba(48, 124, 255, 0.22);
     --glass-bg: rgba(8, 12, 28, 0.78);
     --grid-color: rgba(255, 255, 255, 0.04);
@@ -677,7 +677,7 @@ main {
     padding: 4px 10px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
-    color: #c4b5fd;
+    color: var(--text-secondary);
 }
 
 /* ==========================================================================
@@ -695,7 +695,7 @@ main {
     gap: 12px;
     font-size: 1.3rem;
     margin-bottom: 24px;
-    color: #e2e8f0;
+    color: var(--text-primary);
 }
 
 .cert-block h3 i {
@@ -885,7 +885,7 @@ main {
 
 .ref-item h4 {
     margin-bottom: 10px;
-    color: #e2e8f0;
+    color: var(--text-primary);
 }
 
 .ref-item p {
