@@ -513,13 +513,17 @@ nav {
     width: 44px;
     height: 44px;
     border: none;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     cursor: pointer;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 6px;
     padding: 0;
+    border-radius: 16px;
+    color: var(--text-primary);
 }
 
 .nav-toggle span {
@@ -529,6 +533,15 @@ nav {
     background: var(--text-primary);
     border-radius: 999px;
     transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.nav-toggle-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 700;
+    margin-top: 2px;
 }
 
 nav.open .nav-toggle span:nth-child(1) {
@@ -1298,16 +1311,16 @@ footer {
         right: 0;
         bottom: 0;
         z-index: 999;
-        background: rgba(4, 7, 26, 0.96);
+        background: linear-gradient(180deg, rgba(6, 9, 22, 0.98), rgba(3, 6, 18, 0.98));
         backdrop-filter: blur(22px);
         -webkit-backdrop-filter: blur(22px);
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         justify-content: flex-start;
-        padding: 26px 20px;
-        gap: 18px;
+        padding: 28px 24px;
+        gap: 16px;
         overflow-y: auto;
-        transform: translateY(-120%);
+        transform: translateY(-110%);
         opacity: 0;
         pointer-events: none;
         transition: transform 0.35s ease, opacity 0.35s ease;
@@ -1321,16 +1334,24 @@ footer {
 
     .nav-links a {
         font-size: 1.05rem;
+        padding: 16px 0;
+        width: 100%;
+        display: block;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
     }
 
     .nav-links li {
         width: 100%;
     }
 
-    .nav-links a {
-        display: block;
-        width: 100%;
-        padding: 14px 0;
+    .nav-links a:last-child {
+        border-bottom: none;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+        color: var(--accent-secondary);
     }
 
     .grid-2 { grid-template-columns: 1fr; }
