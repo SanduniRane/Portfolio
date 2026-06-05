@@ -33,15 +33,154 @@
 
 body {
     font-family: var(--font-body);
-    background: linear-gradient(135deg, #0f0c2f 0%, #1a0b3d 25%, #050713 50%, #0a1a3d 75%, #0f0c2f 100%),
-                radial-gradient(circle at top left, rgba(109, 94, 252, 0.25), transparent 15%),
-                radial-gradient(circle at bottom right, rgba(46, 183, 255, 0.22), transparent 15%);
-    background-attachment: fixed;
+    background: none;
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
+}
+
+#live-wallpaper {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 18% 15%, rgba(109, 94, 252, 0.32), transparent 18%),
+        radial-gradient(circle at 80% 20%, rgba(46, 183, 255, 0.24), transparent 16%),
+        radial-gradient(circle at 60% 70%, rgba(255, 120, 210, 0.16), transparent 15%),
+        linear-gradient(135deg, #020312 0%, #04061a 35%, #081a35 75%, #050713 100%);
+    background-size: 220% 220%, 210% 210%, 190% 190%, cover;
+    animation: wallpaper-shift 25s ease alternate infinite,
+               wallpaper-glow 18s ease-in-out infinite;
+}
+
+@keyframes wallpaper-shift {
+    0% {
+        background-position: 0% 10%, 100% 15%, 40% 50%, 0% 0%;
+    }
+    100% {
+        background-position: 100% 85%, 0% 90%, 60% 40%, 100% 100%;
+    }
+}
+
+@keyframes wallpaper-glow {
+    0%, 100% { opacity: 0.88; }
+    50% { opacity: 1; }
+}
+
+#live-bubbles {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#live-bubbles .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.32;
+    filter: blur(1.2px);
+    animation: bubble-rise 22s ease-in infinite, bubble-sway 8s ease-in-out infinite alternate;
+    mix-blend-mode: screen;
+}
+
+#live-bubbles .bubble-1 {
+    width: 120px;
+    height: 120px;
+    left: 6%;
+    background: rgba(124, 58, 237, 0.38);
+    bottom: -12%;
+    animation-duration: 24s;
+}
+
+#live-bubbles .bubble-2 {
+    width: 90px;
+    height: 90px;
+    left: 20%;
+    background: rgba(46, 183, 255, 0.28);
+    bottom: -10%;
+    animation-duration: 20s;
+    animation-delay: 2s;
+}
+
+#live-bubbles .bubble-3 {
+    width: 150px;
+    height: 150px;
+    left: 38%;
+    background: rgba(255, 120, 210, 0.24);
+    bottom: -16%;
+    animation-duration: 26s;
+    animation-delay: 4s;
+}
+
+#live-bubbles .bubble-4 {
+    width: 80px;
+    height: 80px;
+    left: 55%;
+    background: rgba(17, 255, 202, 0.22);
+    bottom: -14%;
+    animation-duration: 18s;
+    animation-delay: 1s;
+}
+
+#live-bubbles .bubble-5 {
+    width: 110px;
+    height: 110px;
+    left: 72%;
+    background: rgba(255, 178, 102, 0.24);
+    bottom: -13%;
+    animation-duration: 21s;
+    animation-delay: 3s;
+}
+
+#live-bubbles .bubble-6 {
+    width: 60px;
+    height: 60px;
+    left: 84%;
+    background: rgba(255, 94, 184, 0.32);
+    bottom: -8%;
+    animation-duration: 16s;
+    animation-delay: 5s;
+}
+
+#live-bubbles .bubble-7 {
+    width: 140px;
+    height: 140px;
+    left: 12%;
+    background: rgba(17, 215, 255, 0.18);
+    bottom: -18%;
+    animation-duration: 28s;
+    animation-delay: 6s;
+}
+
+#live-bubbles .bubble-8 {
+    width: 100px;
+    height: 100px;
+    left: 60%;
+    background: rgba(189, 91, 255, 0.26);
+    bottom: -11%;
+    animation-duration: 23s;
+    animation-delay: 2.5s;
+}
+
+@keyframes bubble-rise {
+    0% {
+        transform: translate3d(0, 0, 0) scale(0.92);
+        opacity: 0.34;
+    }
+    100% {
+        transform: translate3d(15vw, -130vh, 0) scale(1.1);
+        opacity: 0;
+    }
+}
+
+@keyframes bubble-sway {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5vw); }
+    100% { transform: translateX(0); }
 }
 
 body::before {
