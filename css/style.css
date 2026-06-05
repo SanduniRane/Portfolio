@@ -212,6 +212,51 @@ body {
     animation-delay: 4.2s;
 }
 
+/* ==========================================================================
+   Vertical (Up/Down) Colored Bubbles
+   These are smaller accent bubbles that move up and down vertically
+   ========================================================================== */
+#vertical-bubbles {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    overflow: visible;
+}
+
+#vertical-bubbles .v-bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.28;
+    filter: blur(0.6px);
+    mix-blend-mode: screen;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.v-bubble.v-sm { width: 18px; height: 18px; }
+.v-bubble.v-md { width: 28px; height: 28px; }
+.v-bubble.v-lg { width: 44px; height: 44px; }
+
+.v-bubble.v-up { animation: v-move-up 6s cubic-bezier(0.4,0,0.2,1) infinite alternate; }
+.v-bubble.v-down { animation: v-move-down 9s cubic-bezier(0.4,0,0.2,1) infinite alternate-reverse; }
+
+@keyframes v-move-up {
+    0% { transform: translateY(40vh) translateX(0); opacity: 0.2; }
+    50% { transform: translateY(-30vh) translateX(6vw); opacity: 0.35; }
+    100% { transform: translateY(40vh) translateX(-4vw); opacity: 0.18; }
+}
+
+@keyframes v-move-down {
+    0% { transform: translateY(-40vh) translateX(0); opacity: 0.2; }
+    50% { transform: translateY(30vh) translateX(-5vw); opacity: 0.36; }
+    100% { transform: translateY(-40vh) translateX(4vw); opacity: 0.16; }
+}
+
+.v-blue { background: radial-gradient(circle at 35% 35%, rgba(92,200,255,0.95), rgba(92,200,255,0.24)); }
+.v-pink { background: radial-gradient(circle at 35% 35%, rgba(231,138,252,0.96), rgba(231,138,252,0.22)); }
+.v-green { background: radial-gradient(circle at 35% 35%, rgba(17,255,202,0.96), rgba(17,255,202,0.18)); }
+.v-gold { background: radial-gradient(circle at 35% 35%, rgba(255,178,102,0.96), rgba(255,178,102,0.20)); }
+
 @keyframes bubble-rise {
     0% {
         transform: translate3d(0, 0, 0) scale(0.92);
