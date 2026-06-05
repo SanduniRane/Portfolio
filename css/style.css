@@ -494,6 +494,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
 .logo {
@@ -505,6 +506,41 @@ nav {
 
 .logo span {
     color: var(--accent-primary);
+}
+
+.nav-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 999px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+nav.open .nav-toggle span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+nav.open .nav-toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+nav.open .nav-toggle span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
 }
 
 .nav-links {
@@ -1254,7 +1290,48 @@ footer {
     .hero h2 { font-size: 1.25rem; }
     .hero p { margin-inline: auto; max-width: 86%; }
 
-    .nav-links { display: none; } /* add a hamburger later if needed */
+    .nav-toggle { display: flex; }
+    .nav-links {
+        position: fixed;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 999;
+        background: rgba(4, 7, 26, 0.96);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 26px 20px;
+        gap: 18px;
+        overflow-y: auto;
+        transform: translateY(-120%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    nav.open .nav-links {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .nav-links a {
+        font-size: 1.05rem;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        display: block;
+        width: 100%;
+        padding: 14px 0;
+    }
 
     .grid-2 { grid-template-columns: 1fr; }
     .section-title { font-size: 2rem; }
@@ -1288,8 +1365,6 @@ footer {
     .hero-actions { flex-direction: column; gap: 12px; }
 
     .social-links a { font-size: 1.35rem; }
-
-    .nav-links { display: none; }
 
     .timeline { padding-left: 12px; }
     .timeline-dot { left: -20px; }
