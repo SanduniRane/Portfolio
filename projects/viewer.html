@@ -189,6 +189,30 @@
             box-shadow: 0 0 0 4px rgba(0,229,255,0.18);
         }
         .folder-item { user-select: none; }
+        
+        /* Mobile responsive layout */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            .viewer-container {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+            .file-list {
+                flex: 1;
+                max-height: 300px;
+            }
+            .file-content {
+                flex: 1;
+                min-height: 400px;
+            }
+            .project-info {
+                order: -1;
+            }
+        }
     </style>
 </head>
 <body>

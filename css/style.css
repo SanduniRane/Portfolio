@@ -36,8 +36,6 @@ body {
     background: none;
     color: var(--text-primary);
     line-height: 1.6;
-    width: 100%;
-    max-width: 100vw;
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
@@ -345,9 +343,6 @@ body::after {
 
 html {
     scroll-behavior: smooth;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1333,30 +1328,8 @@ footer {
         min-width: 50px;
         min-height: 50px;
     }
-    .hero {
-        width: 100%;
-        overflow-x: hidden;
-    }
     /* Constrain hero visual and profile image on smaller screens to avoid extra scrollbars */
-    .hero-visual {
-        min-height: 320px;
-        overflow: hidden;
-        max-width: 100%;
-        margin: 0 auto;
-    }
-    .hero-content { width: 100%; }
-    .hero-visual {
-        width: 100%;
-    }
-    .hero-visual::before {
-        width: clamp(16rem, 55vw, 22rem);
-        height: clamp(16rem, 55vw, 22rem);
-    }
-    .hero-visual img {
-        max-width: 100%;
-        width: 100%;
-        height: auto;
-    }
+    .hero-visual { min-height: 320px; overflow: visible; }
     .large-profile-img { max-height: 55vh; }
     .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
     .hero h2 { font-size: 1.25rem; }
