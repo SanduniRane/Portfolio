@@ -83,8 +83,14 @@ body {
     border-radius: 50%;
     opacity: 0.32;
     filter: blur(1.2px);
-    animation: bubble-rise 22s ease-in infinite, bubble-sway 8s ease-in-out infinite alternate;
+    animation: bubble-rise 22s ease-in infinite, bubble-sway 12s ease-in-out infinite alternate;
     mix-blend-mode: screen;
+}
+
+#live-bubbles .bubble-small {
+    opacity: 0.18;
+    filter: blur(1px);
+    animation-duration: 16s !important;
 }
 
 #live-bubbles .bubble-1 {
@@ -166,20 +172,71 @@ body {
     animation-delay: 2.5s;
 }
 
+#live-bubbles .bubble-9 {
+    width: 42px;
+    height: 42px;
+    left: 28%;
+    background: rgba(124, 58, 237, 0.22);
+    bottom: -6%;
+    animation-duration: 17s;
+    animation-delay: 1s;
+}
+
+#live-bubbles .bubble-10 {
+    width: 34px;
+    height: 34px;
+    left: 47%;
+    background: rgba(46, 183, 255, 0.22);
+    bottom: -8%;
+    animation-duration: 15s;
+    animation-delay: 2.5s;
+}
+
+#live-bubbles .bubble-11 {
+    width: 28px;
+    height: 28px;
+    left: 68%;
+    background: rgba(255, 120, 210, 0.18);
+    bottom: -5%;
+    animation-duration: 18s;
+    animation-delay: 3.5s;
+}
+
+#live-bubbles .bubble-12 {
+    width: 50px;
+    height: 50px;
+    left: 82%;
+    background: rgba(200, 124, 255, 0.18);
+    bottom: -4%;
+    animation-duration: 19s;
+    animation-delay: 4.2s;
+}
+
 @keyframes bubble-rise {
     0% {
         transform: translate3d(0, 0, 0) scale(0.92);
         opacity: 0.34;
     }
+    25% {
+        transform: translate3d(8vw, -32vh, 0) scale(0.98);
+    }
+    50% {
+        transform: translate3d(-9vw, -68vh, 0) scale(1.03);
+    }
+    75% {
+        transform: translate3d(12vw, -100vh, 0) scale(1.06);
+    }
     100% {
-        transform: translate3d(15vw, -130vh, 0) scale(1.1);
+        transform: translate3d(-16vw, -142vh, 0) scale(1.1);
         opacity: 0;
     }
 }
 
 @keyframes bubble-sway {
     0% { transform: translateX(0); }
-    50% { transform: translateX(5vw); }
+    25% { transform: translateX(4vw); }
+    50% { transform: translateX(-6vw); }
+    75% { transform: translateX(5vw); }
     100% { transform: translateX(0); }
 }
 
