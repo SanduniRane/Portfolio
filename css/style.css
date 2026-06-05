@@ -39,6 +39,8 @@ body {
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
+    width: 100%;
+    overflow-y: auto;
 }
 
 #live-wallpaper {
@@ -751,6 +753,9 @@ main {
     align-items: center;
     min-height: 520px;
     position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .hero-visual::before {
@@ -766,6 +771,7 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     animation: glow-rotate 6s linear infinite;
+    overflow: hidden;
 }
 
 .hero-visual img {
@@ -1313,9 +1319,11 @@ footer {
         padding-top: calc(var(--nav-height) + 40px);
         gap: 24px;
         min-height: auto !important;
+        width: 100%;
+        overflow: hidden;
     }
 
-    .hero-content { max-width: 680px; margin: 0 auto; }
+    .hero-content { max-width: 680px; margin: 0 auto; width: 100%; }
     .hero-actions { justify-content: center; }
     .social-links {
         justify-content: center;
@@ -1329,8 +1337,9 @@ footer {
         min-height: 50px;
     }
     /* Constrain hero visual and profile image on smaller screens to avoid extra scrollbars */
-    .hero-visual { min-height: 320px; overflow: visible; }
-    .large-profile-img { max-height: 55vh; }
+    .hero-visual { min-height: 320px; overflow: hidden; width: 100%; }
+    .hero-visual::before { width: 28rem; height: 28rem; }
+    .large-profile-img { max-height: 55vh; width: min(520px, 90vw); }
     .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
     .hero h2 { font-size: 1.25rem; }
     .hero p { margin-inline: auto; max-width: 86%; }
@@ -1418,14 +1427,16 @@ body.menu-open .nav-links {
     header { height: var(--nav-height); }
     nav { padding: 0 16px; }
     main { padding: 0 16px; }
+    body { width: 100vw; }
 
     .glass-card { padding: 20px; border-radius: 16px; }
     .section { padding: 60px 0; }
 
-    .hero { padding-top: calc(var(--nav-height) + 20px); }
-    .hero-visual { min-height: 320px; }
+    .hero { padding-top: calc(var(--nav-height) + 20px); gap: 24px; }
+    .hero-visual { min-height: 280px; overflow: hidden; width: 100%; }
+    .hero-visual::before { width: 24rem; height: 24rem; }
     .large-profile-img {
-        width: 260px;
+        width: min(260px, 85vw);
         border-radius: 50%;
         box-shadow: 0 30px 90px rgba(109,94,252,0.25);
     }
@@ -1459,8 +1470,16 @@ body.menu-open .nav-links {
 
 /* Ensure images and cards scale nicely on very small devices */
 @media (max-width: 360px) {
+    body { width: 100vw; margin: 0; padding: 0; }
+    main { padding: 0 12px; }
+    nav { padding: 0 12px; }
     .hero h1 { font-size: 2rem; }
+    .hero h2 { font-size: 1.1rem; }
+    .hero p { font-size: 1rem; margin-inline: auto; max-width: 95%; }
     .section-title { font-size: 1.6rem; }
-    .large-profile-img { width: 200px; }
+    .large-profile-img { width: min(200px, 80vw); }
+    .hero-visual::before { width: 20rem; height: 20rem; }
+    .section { padding: 40px 0; }
+    .glass-card { padding: 16px; }
 }
 
