@@ -619,6 +619,8 @@ main {
 .hero-content {
     flex: 1;
     max-width: 600px;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-badge {
@@ -713,6 +715,8 @@ main {
     display: flex;
     gap: 24px;
     justify-content: flex-start;
+    position: relative;
+    z-index: 3;
 }
 
 .social-links a {
@@ -729,6 +733,8 @@ main {
     color: var(--text-secondary);
     transition: var(--transition), background 0.25s ease;
     touch-action: manipulation;
+    position: relative;
+    z-index: 4;
 }
 
 .social-links a:hover {
@@ -1306,6 +1312,7 @@ footer {
         text-align: center;
         padding-top: calc(var(--nav-height) + 40px);
         gap: 24px;
+        min-height: auto !important;
     }
 
     .hero-content { max-width: 680px; margin: 0 auto; }
@@ -1321,6 +1328,9 @@ footer {
         min-width: 50px;
         min-height: 50px;
     }
+    /* Constrain hero visual and profile image on smaller screens to avoid extra scrollbars */
+    .hero-visual { min-height: 320px; overflow: visible; }
+    .large-profile-img { max-height: 55vh; }
     .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
     .hero h2 { font-size: 1.25rem; }
     .hero p { margin-inline: auto; max-width: 86%; }
@@ -1419,6 +1429,7 @@ body.menu-open .nav-links {
         border-radius: 50%;
         box-shadow: 0 30px 90px rgba(109,94,252,0.25);
     }
+    .large-profile-img { max-height: 50vh; }
 
     .btn { width: 100%; padding: 14px 16px; border-radius: 12px; }
     .hero-actions { flex-direction: column; gap: 12px; }
