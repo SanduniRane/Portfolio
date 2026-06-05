@@ -90,10 +90,15 @@
                     <a href="#contact" class="btn btn-outline">Contact Me</a>
                 </div>
                 <div class="social-links fade-in delays-5">
-                    <a href="https://www.linkedin.com/in/sanduni-ranawake-88b91a283" target="_blank"><i
-                            class="ph ph-linkedin-logo"></i></a>
-                    <a href="https://github.com/SanduniRane" target="_blank"><i class="ph ph-github-logo"></i></a>
-                    <a href="mailto:sanduniranawake4@gmail.com"><i class="ph ph-envelope-simple"></i></a>
+                    <a href="https://www.linkedin.com/in/sanduni-ranawake-88b91a283" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+                        <i class="ph ph-linkedin-logo"></i>
+                    </a>
+                    <a href="https://github.com/SanduniRane" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                        <i class="ph ph-github-logo"></i>
+                    </a>
+                    <a href="mailto:sanduniranawake4@gmail.com" aria-label="Send email">
+                        <i class="ph ph-envelope-simple"></i>
+                    </a>
                 </div>
             </div>
             <div class="hero-visual fade-in delays-3">
@@ -529,11 +534,15 @@
     <script>
         const navToggle = document.querySelector('.nav-toggle');
         const nav = document.querySelector('nav');
+        const body = document.body;
+        const navLinksContainer = document.querySelector('.nav-links');
         const navLinks = document.querySelectorAll('.nav-links a');
 
         if (navToggle && nav) {
             navToggle.addEventListener('click', () => {
                 const isOpen = nav.classList.toggle('open');
+                body.classList.toggle('menu-open', isOpen);
+                navLinksContainer?.classList.toggle('open', isOpen);
                 navToggle.setAttribute('aria-expanded', String(isOpen));
                 navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
             });
@@ -543,6 +552,8 @@
             link.addEventListener('click', () => {
                 if (nav.classList.contains('open')) {
                     nav.classList.remove('open');
+                    body.classList.remove('menu-open');
+                    navLinksContainer?.classList.remove('open');
                     navToggle?.setAttribute('aria-expanded', 'false');
                     navToggle?.setAttribute('aria-label', 'Open menu');
                 }
